@@ -12,6 +12,7 @@ Continuing ...
 #### Q1:
 
 错把`f`**函数**当成**数值**了：
+
     def a_plus_abs_b(a, b):
         """Return a+abs(b), but without calling abs.
 
@@ -31,6 +32,7 @@ Continuing ...
         return f(a,b)
 
 正确的：
+
     def a_plus_abs_b(a, b):
         if b < 0:
             f = sub
@@ -44,6 +46,7 @@ Continuing ...
 
 1. 注意整数和浮点数的问题：`/`会让数字变成**浮点数**，而`//`才是**整数**；
 2. 注意是否**展示**答案，也就是说题目到底要的是什么（遗忘了print）。
+
     def hailstone(n):
         """Print the hailstone sequence starting at n and return its
         length.
@@ -77,6 +80,7 @@ Continuing ...
 **没有print！！**
 
 正确的：
+
 def hailstone(n):
     """Print the hailstone sequence starting at n and return its
     length.
