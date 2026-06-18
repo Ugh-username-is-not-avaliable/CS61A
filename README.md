@@ -95,6 +95,45 @@ Continuing ...
                 print(n)
         return i
 
+### homework 1 能跑但却不够简洁
+*date: 2026/6/18*
+
+#### Q3：
+我的：
+
+    def largest_factor(n):
+        """Return the largest factor of n that is smaller than n.
+
+        >>> largest_factor(15) # factors are 1, 3, 5
+        5
+        >>> largest_factor(80) # factors are 1, 2, 4, 5, 8, 10, 16, 20, 40
+        40
+        >>> largest_factor(13) # factor is 1 since 13 is prime
+        1
+        """
+        "*** YOUR CODE HERE ***"
+        i = n - 1
+        while i < n:
+            if n % i == 0:
+                return i
+            elif i == 0:
+                return 1
+            else:
+                i -= 1
+
+能跑，但是很冗余：
+1. ``while i < n``的条件很奇怪，这个条件其实是永远成立的，也就是说函数靠``return``退出;
+2. ``elif i == 0``是多余的条件，因为``i = 1``的时候就会输出了。
+
+标准答案：
+
+    def largest_factor(n):
+        factor = n - 1
+        while factor > 0:
+            if n % factor == 0:
+                return factor
+            factor -= 1
+
 ### homework 2
 *date: 2026/6/18*
 
