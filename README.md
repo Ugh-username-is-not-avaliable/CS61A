@@ -261,4 +261,217 @@ Continuing ...
             return x
         return g
 
+### homework 3
+*date: 2026/7/10*
+碎碎念一下，好像过去有些久了呢……之前跑去读C#写星露谷Mod了，感觉自己还是得学，所以回来继续写CS61A作业了。
 
+### Q1：
+
+错误第一版：
+1. ``num_eights(0)``会一直递归，只约束了``count_eight(a)``参数为0时的情况，但却没有约束``num_eights(0)``，所以无限递归了。
+
+
+    def num_eights(n):
+        """Returns the number of times 8 appears as a digit of n.
+
+        >>> num_eights(3)
+        0
+        >>> num_eights(8)
+        1
+        >>> num_eights(88888888)
+        8
+        >>> num_eights(2638)
+        1
+        >>> num_eights(86380)
+        2
+        >>> num_eights(12345)
+        0
+        >>> num_eights(8782089)
+        3
+        >>> from construct_check import check
+        >>> # ban all assignment statements
+        >>> check(HW_SOURCE_FILE, 'num_eights',
+        ...       ['Assign', 'AnnAssign', 'AugAssign', 'NamedExpr', 'For', 'While'])
+        True
+        """
+        "*** YOUR CODE HERE ***"
+        def count_eight(a):
+            if a % 10 == 8:
+                return 1
+            else:
+                return 0
+        return num_eights(n//10) + count_eight(n)
+
+改后答案：
+
+
+    def num_eights(n):
+        def count_eight(a):
+            if a % 10 == 8:
+                return 1
+            else:
+                return 0
+        if n == 0:
+            return 0   
+        return num_eights(n//10) + count_eight(n)
+
+### Q3:
+
+错误第一版：
+1. 没有分清``if``和``elif``的区别，如果是
+    if i < n:
+        ……
+        i += 2
+        ……
+    if i == n:
+        ……
+
+在i经过第一个if块之后，它有可能**直接进入**下一个if块，从而提前返回。这里应该用``elif``以表示三个条件是同时判断的;
+2. 直接写``return``后面什么都不跟，返回的就是None，而None不属于int类型。
+
+
+    def interleaved_sum(n, odd_func, even_func):
+        """Compute the sum odd_func(1) + even_func(2) + odd_func(3) + ..., up
+        to n.
+
+        >>> identity = lambda x: x
+        >>> square = lambda x: x * x
+        >>> triple = lambda x: x * 3
+        >>> interleaved_sum(5, identity, square) # 1   + 2*2 + 3   + 4*4 + 5
+        29
+        >>> interleaved_sum(5, square, identity) # 1*1 + 2   + 3*3 + 4   + 5*5
+        41
+        >>> interleaved_sum(4, triple, square)   # 1*3 + 2*2 + 3*3 + 4*4
+        32
+        >>> interleaved_sum(4, square, triple)   # 1*1 + 2*3 + 3*3 + 4*3
+        28
+        >>> from construct_check import check
+        >>> check(HW_SOURCE_FILE, 'interleaved_sum', ['While', 'For', 'Mod']) # ban loops and %
+        True
+        """
+        "*** YOUR CODE HERE ***"
+        def part(i, n):
+            if i < n:
+                k = odd_func(i) + even_func(i+1)
+                i += 2
+                sum = k + part(i,n)
+            if i == n:
+                k = odd_func(i)
+                return k
+            if i == (n + 1):
+                return
+            return sum
+        return part(1, n)
+
+改后答案：
+
+
+    def interleaved_sum(n, odd_func, even_func):
+        def part(i, n):
+            if i < n:
+                k = odd_func(i) + even_func(i+1)
+                i += 2
+                sum = k + part(i,n)
+            elif i == n:
+                k = odd_func(i)
+                return k
+            elif i == (n + 1):
+                return 0
+            return sum
+        return part(1, n)
+
+### Q4: 
+
+第一版错误：
+1. 算出的结果是考虑了硬币重复使用的结果，然而题目要的是不重复使用的；
+2. 这里没有选择传递coin，如果想要在执行过程中保存某种状态，则需要一个参数传递它的状态。
+
+
+    def count_coins(total):
+        """Return the number of ways to make change using coins of value of 1, 5, 10, 25.
+        >>> count_coins(15)
+        6
+        >>> count_coins(10)
+        4
+        >>> count_coins(20)
+        9
+        >>> count_coins(100) # How many ways to make change for a dollar?
+        242
+        >>> count_coins(200)
+        1463
+        >>> from construct_check import check
+        >>> # ban iteration
+        >>> check(HW_SOURCE_FILE, 'count_coins', ['While', 'For'])
+        True
+        """
+        "*** YOUR CODE HERE ***"
+        coin = 25
+        if total == 0:
+            return 1
+        elif total < 0:
+            return 0
+        else:
+            return count_coins(total-coin) + count_coins(total-next_smaller_coin(coin)) + count_coins(total-next_smaller_coin(next_smaller_coin(coin))) + count_coins(total-next_smaller_coin(next_smaller_coin(next_smaller_coin(coin))))
+
+第二版错误：
+1. 尝试第一个数值15，函数会变成：``（15，5）→（5，5）→（0，5）``而实际上还有一种情况``（15，5）→（5，5）→（5，1）``是成立的，这是因为我写的函数在最开始用``n = n - coin``用余额判断条件是否成立，忽略了余额刚好等于某硬币面值时的其她可能。
+
+
+    def count_coins(total):
+        def count_with_coins(n, coin):
+            n = n - coin
+            if n == 0:
+                return 1
+            elif n < 0:
+                return 0
+            if coin == 1:
+                k = count_with_coins(n, coin)
+            else:
+                k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
+            return k
+        return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
+
+第三版错误：
+1. 虽然我已经知道了正确答案，但是它和我想法不一样，我要看看我错哪了；
+2. 虽然有的时候错在坚持错误答案，但在我没找到我错哪之前我都是对的；
+3. 递归树的节点变得**不唯一**了，且在``n = n - coin``后的n表示被消耗的**余额**，而如果在``n = n - coin``之前判断，那么会出现n的定义变化的情况。
+
+
+
+    def count_coins(total):
+        def count_with_coins(n, coin):
+            if n == coin & coin != 1:
+                return 1 + count_with_coins(n, next_smaller_coin(coin))
+            n = n - coin
+            if n == 0:
+                return 1
+            elif n < 0:
+                return 0
+            if coin == 1:
+                k = count_with_coins(n, coin)
+            else:
+                k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
+            return k
+        return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
+
+最后我选择了放弃……总结一下错误思路：
+*递归分了两个维度，但这两个维度未必是**正交**的。*
+
+标准答案：
+把选择作为递归分支：用这个硬币；不用硬币并且进入更小的硬币：
+1. 递减的方式同样可以避免重复使用；
+2. 设计状态为（当前目标，当前允许选择范围）；
+3. 分支为：不用当前选择 → 选择范围变小；用当前选择 → 目标减少，选择范围不变。
+
+    def constrained_count(total, smallest_coin):
+        def constrained_count_small(total, largest_coin):
+                if total == 0:
+                    return 1
+                if total < 0:
+                    return 0
+                if largest_coin == None:
+                    return 0
+                without_coin = constrained_count_small(total, next_smaller_coin(largest_coin))
+                with_coin = constrained_count_small(total - largest_coin, largest_coin)
+                return without_coin + with_coin
+            return constrained_count_small(total, 25)
