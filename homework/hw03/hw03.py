@@ -166,18 +166,17 @@ def count_coins(total):
     True
     """
     "*** YOUR CODE HERE ***"
-    def count_with_coins(total, n, largest_coin):
-        if n == 0:
+    def constrained_count_small(total, largest_coin):
+        if total == 0:
             return 1
-        elif n < 0:
+        if total < 0:
             return 0
-        if largest_coin == 1:
-            k = count_with_coins(total, total-largest_coin, largest_coin)
-        else: 
-            k = count_with_coins(total, total-largest_coin, largest_coin) + count_with_coins(total, total-largest_coin, next_smaller_coin(largest_coin))
-        return k
-    return count_with_coins(total, total, 25) + count_with_coins(total, total, 10) + count_with_coins(total, total, 5) + count_with_coins(total, total, 1) 
-
+        if largest_coin == None:
+            return 0
+        without_coin = constrained_count_small(total, next_smaller_coin(largest_coin))
+        with_coin = constrained_count_small(total - largest_coin, largest_coin)
+        return without_coin + with_coin
+    return constrained_count_small(total, 25)
 
 
 
