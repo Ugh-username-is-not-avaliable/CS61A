@@ -247,7 +247,7 @@ Continuing ...
                 g(f(x))
                 i += 1
 
-正确答案：
+正确答案：  
 （其实和标准答案不一样）
 1. 用``for i in range(n)``其实也可以不用计数器，不过好像差别不大；
 2. 关键在于形成迭代调用，形成x→f(x)→f(f(x))这种递归形式，最简单的就是``x = f(x)``;
@@ -263,7 +263,8 @@ Continuing ...
 
 ### homework 3
 *date: 2026/7/10*
-碎碎念一下，好像过去有些久了呢……之前跑去读C#写星露谷Mod了，感觉自己还是得学，所以回来继续写CS61A作业了。
+
+<sub>碎碎念一下，好像过去有些久了呢……之前跑去读C#写星露谷Mod了，感觉自己还是得学，所以回来继续写CS61A作业了。</sub>
 
 ### Q1：
 
@@ -386,71 +387,71 @@ Continuing ...
 1. 算出的结果是考虑了硬币重复使用的结果，然而题目要的是不重复使用的；
 2. 这里没有选择传递coin，如果想要在执行过程中保存某种状态，则需要一个参数传递它的状态。
 
-    def count_coins(total):
-        """Return the number of ways to make change using coins of value of 1, 5, 10, 25.
-        >>> count_coins(15)
-        6
-        >>> count_coins(10)
-        4
-        >>> count_coins(20)
-        9
-        >>> count_coins(100) # How many ways to make change for a dollar?
-        242
-        >>> count_coins(200)
-        1463
-        >>> from construct_check import check
-        >>> # ban iteration
-        >>> check(HW_SOURCE_FILE, 'count_coins', ['While', 'For'])
-        True
-        """
-        "*** YOUR CODE HERE ***"
-        coin = 25
-        if total == 0:
-            return 1
-        elif total < 0:
-            return 0
-        else:
-            return count_coins(total-coin) + count_coins(total-next_smaller_coin(coin)) + count_coins(total-next_smaller_coin(next_smaller_coin(coin))) + count_coins(total-next_smaller_coin(next_smaller_coin(next_smaller_coin(coin))))
+        def count_coins(total):
+            """Return the number of ways to make change using coins of value of 1, 5, 10, 25.
+            >>> count_coins(15)
+            6
+            >>> count_coins(10)
+            4
+            >>> count_coins(20)
+            9
+            >>> count_coins(100) # How many ways to make change for a dollar?
+            242
+            >>> count_coins(200)
+            1463
+            >>> from construct_check import check
+            >>> # ban iteration
+            >>> check(HW_SOURCE_FILE, 'count_coins', ['While', 'For'])
+            True
+            """
+            "*** YOUR CODE HERE ***"
+            coin = 25
+            if total == 0:
+                return 1
+            elif total < 0:
+                return 0
+            else:
+                return count_coins(total-coin) + count_coins(total-next_smaller_coin(coin)) + count_coins(total-next_smaller_coin(next_smaller_coin(coin))) + count_coins(total-next_smaller_coin(next_smaller_coin(next_smaller_coin(coin))))
 
 第二版错误：
 1. 尝试第一个数值15，函数会变成：``（15，5）→（5，5）→（0，5）``而实际上还有一种情况``（15，5）→（5，5）→（5，1）``是成立的，这是因为我写的函数在最开始用``n = n - coin``用余额判断条件是否成立，忽略了余额刚好等于某硬币面值时的其她可能。
 
-    def count_coins(total):
-        def count_with_coins(n, coin):
-            n = n - coin
-            if n == 0:
-                return 1
-            elif n < 0:
-                return 0
-            if coin == 1:
-                k = count_with_coins(n, coin)
-            else:
-                k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
-            return k
-        return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
+        def count_coins(total):
+            def count_with_coins(n, coin):
+                n = n - coin
+                if n == 0:
+                    return 1
+                elif n < 0:
+                    return 0
+                if coin == 1:
+                    k = count_with_coins(n, coin)
+                else:
+                    k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
+                return k
+            return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
 
 第三版错误：
 1. 虽然我已经知道了正确答案，但是它和我想法不一样，我要看看我错哪了；
 2. 虽然有的时候错在坚持错误答案，但在我没找到我错哪之前我都是对的；
 3. 递归树的节点变得**不唯一**了，且在``n = n - coin``后的n表示被消耗的**余额**，而如果在``n = n - coin``之前判断，那么会出现n的定义变化的情况。
 
-    def count_coins(total):
-        def count_with_coins(n, coin):
-            if n == coin & coin != 1:
-                return 1 + count_with_coins(n, next_smaller_coin(coin))
-            n = n - coin
-            if n == 0:
-                return 1
-            elif n < 0:
-                return 0
-            if coin == 1:
-                k = count_with_coins(n, coin)
-            else:
-                k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
-            return k
-        return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
+        def count_coins(total):
+            def count_with_coins(n, coin):
+                if n == coin & coin != 1:
+                    return 1 + count_with_coins(n, next_smaller_coin(coin))
+                n = n - coin
+                if n == 0:
+                    return 1
+                elif n < 0:
+                    return 0
+                if coin == 1:
+                    k = count_with_coins(n, coin)
+                else:
+                    k = count_with_coins(n, coin) + count_with_coins(n, next_smaller_coin(coin))
+                return k
+            return count_with_coins(total, 25) + count_with_coins(total, 10) + count_with_coins(total, 5) + count_with_coins(total, 1)
 
-最后我选择了放弃……总结一下错误思路：
+最后我选择了放弃……总结一下错误思路：  
 *递归分了两个维度，但这两个维度未必是**正交**的。*
 
 标准答案：
@@ -459,15 +460,15 @@ Continuing ...
 2. 设计状态为（当前目标，当前允许选择范围）；
 3. 分支为：不用当前选择 → 选择范围变小；用当前选择 → 目标减少，选择范围不变。
 
-    def constrained_count(total, smallest_coin):
-        def constrained_count_small(total, largest_coin):
-                if total == 0:
-                    return 1
-                if total < 0:
-                    return 0
-                if largest_coin == None:
-                    return 0
-                without_coin = constrained_count_small(total, next_smaller_coin(largest_coin))
-                with_coin = constrained_count_small(total - largest_coin, largest_coin)
-                return without_coin + with_coin
-            return constrained_count_small(total, 25)
+        def constrained_count(total, smallest_coin):
+            def constrained_count_small(total, largest_coin):
+                    if total == 0:
+                        return 1
+                    if total < 0:
+                        return 0
+                    if largest_coin == None:
+                        return 0
+                    without_coin = constrained_count_small(total, next_smaller_coin(largest_coin))
+                    with_coin = constrained_count_small(total - largest_coin, largest_coin)
+                    return without_coin + with_coin
+                return constrained_count_small(total, 25)
