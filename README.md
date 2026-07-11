@@ -386,7 +386,6 @@ Continuing ...
 1. 算出的结果是考虑了硬币重复使用的结果，然而题目要的是不重复使用的；
 2. 这里没有选择传递coin，如果想要在执行过程中保存某种状态，则需要一个参数传递它的状态。
 
-
     def count_coins(total):
         """Return the number of ways to make change using coins of value of 1, 5, 10, 25.
         >>> count_coins(15)
@@ -416,7 +415,6 @@ Continuing ...
 第二版错误：
 1. 尝试第一个数值15，函数会变成：``（15，5）→（5，5）→（0，5）``而实际上还有一种情况``（15，5）→（5，5）→（5，1）``是成立的，这是因为我写的函数在最开始用``n = n - coin``用余额判断条件是否成立，忽略了余额刚好等于某硬币面值时的其她可能。
 
-
     def count_coins(total):
         def count_with_coins(n, coin):
             n = n - coin
@@ -435,8 +433,6 @@ Continuing ...
 1. 虽然我已经知道了正确答案，但是它和我想法不一样，我要看看我错哪了；
 2. 虽然有的时候错在坚持错误答案，但在我没找到我错哪之前我都是对的；
 3. 递归树的节点变得**不唯一**了，且在``n = n - coin``后的n表示被消耗的**余额**，而如果在``n = n - coin``之前判断，那么会出现n的定义变化的情况。
-
-
 
     def count_coins(total):
         def count_with_coins(n, coin):
