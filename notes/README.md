@@ -54,6 +54,14 @@ eg.:
     []          []
     ```
 
+## Python语法零碎
+1. 运行Python文件的方法：
+    - 在命令符中使用``python filename.py``代码执行完毕后会返回到命令行界面。如果文件只包含函数定义，没有语法错误就不会有任何输出。
+    - 在命令符中使用``python -i filename.py``会打开一个交互式Python会话（显示``>>>``提示符），可以执行表达式，``Ctrl+z Enter``可以退出。
+    - 在命令符中使用``python -m doctest filename.py``可以运行文件中的示例代码。
+2. ``return 'x'``会返回``'x'``，而``print('x')``是打印``x``。
+
+
 ## Higher Oder Functions
 - Functions are first class: 函数时第一类值，意味着它们可以作为参数传递，可以作为返回值返回。
 - 高阶函数：可接受另一个函数作为参数，或返回一个函数。
@@ -277,7 +285,38 @@ return 24
 
     {<key exp>: <value exp> for <name> in <iter exp>}
 即去掉``if``的筛选部分。
+---
+### 递归类别整理
+```
+递归（Recursion）
+│
+├── 按调用次数分类
+│   ├── 线性递归（Linear Recursion）
+│   └── 树形递归（Tree Recursion）
+│
+├── 按建立结果的方法分类
+│   ├── 返回值递归（Build on Return Value）
+│   └── 参数累积递归（Accumulator）
+│
+└── 按递归调用的位置分类
+    ├── 尾递归（Tail Recursion）
+    └── 非尾递归（Non-tail Recursion）
+```
+- 尾递归：递归调用是函数执行的最后一件事。  
+例如：
 
+        def fact_times(n, k):
+            if n == 0:
+                return k
+            return fact_times(n-1, k*n)
+    递归是最后一步
+- 非尾递归的例子：
+
+        def factorial(n):
+            if n == 1:
+                return 1
+            return factorial(n - 1) * n
+    递归后还需要进行运算
 ## 数据抽象
 
 - 数据抽象：一种方法论，函数通过其强制在数据的表示和使用之间建立一个抽象**屏障**。
@@ -354,7 +393,7 @@ return 24
 #### 生成器
 - 生成器函数：一种产生值而不是返回值的函数。   
 
-在编写程序是，如果只想要其中的一些可能，就可以使用yield。
+在编写程序时，如果只想要其中的一些可能，就可以使用yield。
 
     yield from generator(x)
             ||
