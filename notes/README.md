@@ -13,7 +13,14 @@
 
 2. 短路求值：
 > eg. false and something()   
-> python根本不会调用something()
+> python根本不会调用something()  
+
+Python的``and``和``or``运算符具有*短路*特性：
+| 运算符 | 检查是否 | 从左到右计算到 | 示例
+|---|---|---|---|
+|AND|所有值都为真|第一个假值|``False and 1/0``的计算结果为``False``|
+|OR|至少一个值为真|第一个真值|``True or 1/0``的计算结果为``True``|
+---
 
 3. 错有三种：
     1. 语法错误；
@@ -53,6 +60,7 @@ eg.:
     List A     List B
     []          []
     ```
+10. 谓词函数（Predicate）：返回值是``True``或``False``的函数。
 
 ## Python语法零碎
 1. 运行Python文件的方法：
