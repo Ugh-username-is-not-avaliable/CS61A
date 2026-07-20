@@ -120,4 +120,40 @@ True
                 return n
             else:
                 n += 1
+### lab03
+
+#### Q7：双重8
+一个值得注意的错误：调用递归时应当注意**返回**，除非不想要上一层的返回结果，否则如果不``return``，结果会留在上一层而不向下层返回。
+
+    def double_eights(n):
+        if n % 10 == 8:
+            n = n // 10
+            if n % 10 == 8:
+                return  True
+            else: 
+                n = n // 10
+                double_eights(n)
+        else:
+            n = n // 10
+            double_eights(n)
+        if n == 0:
+            return False
+这段代码中，因为递归却没return，double_eights(880)不返回任何结果。
+并且需要注意，在执行完if和else后是否还会执行下面的``if n == 0``。（如果此处使用了``return double_eights(n)``，那其实``if n == 0``永远没有机会执行，所以要换成``elif``）
+
+改后的代码：
+
+    def double_eights(n):
+        if n % 10 == 8:
+            n = n // 10
+            if n % 10 == 8:
+                return  True
+            else: 
+                n = n // 10
+                return double_eights(n)
+        elif n == 0:
+            return False
+        else:
+            n = n // 10
+            return double_eights(n)
 
