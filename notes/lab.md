@@ -157,3 +157,25 @@ True
             n = n // 10
             return double_eights(n)
 
+### lab04
+#### Q2 buy: 
+1. 在递归中应该**传递状态**，而不是给**局部变量**赋值，因为每一层的局部变量都是不同的：  
+    - 是``cart + display(fruit, k)``，而不是``cart += display(fruit, k)``；
+2. 思考递归在哪里剪枝：递归开始时、递归过程中，还是递归结束后。
+    - 这道题在递归过程中剪枝
+    ```
+    if fruits == [] and amount == 0:
+            print(cart)
+    ```
+正确的代码：
+
+    def buy(required_fruits, prices, total_amount):
+        def add(fruits, amount, cart):
+            if fruits == [] and amount == 0:
+                print(cart)
+            elif fruits and amount > 0:
+                fruit = fruits[0]
+                price = prices[fruit]
+                for k in range(1, amount // price + 1):
+                    add(fruits[1:], amount - (price * k), cart + display(fruit, k))
+        add(required_fruits, total_amount, '')

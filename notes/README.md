@@ -98,7 +98,17 @@ eg.:
 5. 求绝对值的内置函数：``abs(x)``。
 6. 访问字典可以使用``.key()``、``.values()``、``.items()``。
 7. 可以用``in``关键字来检查字典中是否包含某个**键**。
-
+8. ``assert``是一个检查条件是否为真的函数，如果非真，就会报错：
+```
+语法：
+    assert 条件
+eg.: 
+    x = 10
+    assert x > 0
+    无事发生
+    assert x < 0
+    则报AssertionError
+```
 
 ## Higher Oder Functions
 - Functions are first class: 函数时第一类值，意味着它们可以作为参数传递，可以作为返回值返回。

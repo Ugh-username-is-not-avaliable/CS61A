@@ -266,7 +266,7 @@ Continuing ...
 
 <sub>碎碎念一下，好像过去有些久了呢……之前跑去读C#写星露谷Mod了，感觉自己还是得学，所以回来继续写CS61A作业了。</sub>
 
-### Q1：
+#### Q1：
 
 错误第一版：
 1. ``num_eights(0)``会一直递归，只约束了``count_eight(a)``参数为0时的情况，但却没有约束``num_eights(0)``，所以无限递归了。
@@ -316,7 +316,7 @@ Continuing ...
             return 0   
         return num_eights(n//10) + count_eight(n)
 
-### Q3:
+#### Q3:
 
 错误第一版：
 1. 没有分清``if``和``elif``的区别，如果是
@@ -381,7 +381,7 @@ Continuing ...
             return sum
         return part(1, n)
 
-### Q4: 
+#### Q4: 
 
 第一版错误：
 1. 算出的结果是考虑了硬币重复使用的结果，然而题目要的是不重复使用的；
@@ -472,3 +472,132 @@ Continuing ...
                     with_coin = constrained_count_small(total - largest_coin, largest_coin)
                     return without_coin + with_coin
                 return constrained_count_small(total, 25)
+
+### homework 04
+*date: 2026/7/23*
+
+#### Q1
+
+写错的代码：
+
+    def deep_map(f, s):
+        """Replace all non-list elements x with f(x) in the nested list s.
+
+        >>> six = [1, 2, [3, [4], 5], 6]
+        >>> deep_map(lambda x: x * x, six)
+        >>> six
+        [1, 4, [9, [16], 25], 36]
+        >>> # Check that you're not making new lists
+        >>> s = [3, [1, [4, [1]]]]
+        >>> s1 = s[1]
+        >>> s2 = s1[1]
+        >>> s3 = s2[1]
+        >>> deep_map(lambda x: x + 1, s)
+        >>> s
+        [4, [2, [5, [2]]]]
+        >>> s1 is s[1]
+        True
+        >>> s2 is s1[1]
+        True
+        >>> s3 is s2[1]
+        True
+        """
+        "*** YOUR CODE HERE ***"
+        for i in range(len(s)+1):
+            if type(s[i]) == list:
+                return deep_map(f, s[i])
+            else: 
+                f(s[i])
+                return s
+错误点：  
+1. ``range(len(s)+1)``是错的，因为假如``s = [1, 2, 3]``，会得到``len(s) = 3``，所以无需额外加一；
+2. ``else：……return s``这一段让循环**提前终止**了。假如``s[0] = 1``，它进入``else``后会执行``f(s[0])``，然后直接``return s``，这样循环就没有遍历每一个元素，而是在第一个满足条件的元素出现后直接``return``。
+
+第二版错误：
+评价为抓住了核心但没完全抓住。
+
+    def deep_map(f, s):
+        for i in range(len(s)):
+            if type(s[i]) == list:
+                return deep_map(f, s[i])
+            else: 
+                s[i] = f(s[i])
+        return s
+
+题目要求不要创造新的列表，所以使用``s[i] = f(s[i])``是正确的，因为这样就是修改了原列表，但是在递归处有一句``return deep_map(f, s[i])``，这个直觉来源于过去的题目中，题目要求输出**新东西**，如果要保存递归的结果，就需要``return``，但``return``会提前结束循环。而这道题目并不要求输出新序列，而是修改旧序列，所以无需``return``；
+并且，应该审题，题目不期待函数有任何输出，所以最后也无需``return s``。
+
+#### Q3:
+
+可以简化答案：
+
+    def balanced(m):
+        if is_planet(m):
+            return True
+        elif total_mass(end(left(m))) * length(left(m)) == total_mass(end(right(m))) * length(right(m)):
+            if is_planet(end(left(m))) and is_planet(end(right(m))):
+                return True
+            else:
+                return (balanced(end(left(m))) and balanced(end(right(m))))
+        else:
+            return False
+
+简化成：
+
+    def balanced(m):
+        if is_planet(m):
+            return True
+        elif total_mass(end(left(m))) * length(left(m)) == total_mass(end(right(m))) * length(right(m)):
+                return (balanced(end(left(m))) and balanced(end(right(m))))
+        else:
+            return False
+
+#### Q4:
+1. 递归返回的每一层应当是相同的类型；
+2. 可以使用多个for展开列表
+
+第一版错误：
+
+    def max_path_sum(t):
+        """Return the maximum root-to-leaf path sum of a tree.
+        >>> t = tree(1, [tree(5, [tree(1), tree(3)]), tree(10)])
+        >>> max_path_sum(t) # 1, 10
+        11
+        >>> t2 = tree(5, [tree(4, [tree(1), tree(3)]), tree(2, [tree(10), tree(3)])])
+        >>> max_path_sum(t2) # 5, 2, 10
+        17
+        """
+        "*** YOUR CODE HERE ***"
+        def sum_tree(t):
+            if is_leaf(t):
+                return label(t)
+            else:
+                return [(sum_tree(branch) + label(t)) for branch in branches(t)]
+        return max(sum_tree(t))
+
+在这版中，``sum_tree(branch)``有可能返回列表，而列表作为``List``，不能和``label(t)``这个``int``直接相加，把``label(t)``加在返回的``List``的每个元素中，可以再用一次列表推导式。  
+改后的版本：
+
+    def max_path_sum(t):
+        def sum_tree(t):
+            if is_leaf(t):
+                return [label(t)]
+            else:
+                return [(k + label(t)) for branch in branches(t) for k in sum_tree(branch)]
+        return max(sum_tree(t))
+
+然而我的方法使用了列出所有可能，再找到最大值的方法，官方解答更优雅：
+
+    def max_path_sum(t):
+    # 非列表推导式解决方案
+        if is_leaf(t):
+            return label(t)
+        highest_sum = 0
+        for b in branches(t):
+            highest_sum = max(max_path_sum(b), highest_sum)
+        return label(t) + highest_sum
+    ```# 列表解析解法
+        if is_leaf(t):
+        return label(t)
+        else:
+        return label(t) + max([max_path_sum(b) for b in branches(t)])
